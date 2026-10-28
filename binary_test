@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary & Decimal Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Monaco', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        .bit-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bit-btn:hover {
+            transform: translateY(-2px);
+        }
+        .bit-btn:active {
+            transform: translateY(0);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-mono font-bold text-xl shadow-md shadow-cyan-500/20">
+                    10
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">BitShift</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Binary & Decimal Converter</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle" class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
+                    <i id="themeIcon" class="fas fa-moon text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Main Converter Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-100 dark:border-slate-700/60 relative overflow-hidden">
+            <!-- Background Decorative Glow -->
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 dark:bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <!-- Controls & Mode Selector -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full sm:w-auto bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <button id="modeBinToDec" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm">
+                        Binary &rarr; Decimal
+                    </button>
+                    <button id="modeDecToBin" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        Decimal &rarr; Binary
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <!-- Quick Presets Dropdown/Buttons -->
+                    <span class="text-xs text-slate-400 hidden sm:inline">Samples:</span>
+                    <button class="sample-btn px-2.5 py-1 text-xs font-mono rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700" data-val="1010">1010</button>
+                    <button class="sample-btn px-2.5 py-1 text-xs font-mono rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700" data-val="255">255</button>
+                    <button class="sample-btn px-2.5 py-1 text-xs font-mono rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700" data-val="10011101">10011101</button>
+                </div>
+            </div>
+
+            <!-- Input / Output Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <!-- Input Box -->
+                <div class="md:col-span-5 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label id="inputLabel" for="numberInput" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            Enter Binary Number
+                        </label>
+                        <span id="inputBitsCount" class="text-xs font-mono text-slate-400">0 bits</span>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="numberInput" placeholder="e.g. 10101" 
+                            class="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none font-mono text-lg transition-all pr-10"
+                            autocomplete="off" spellcheck="false">
+                        <button id="clearInputBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <p id="errorMessage" class="text-xs text-rose-500 min-h-[1rem] flex items-center gap-1 font-medium hidden">
+                        <i class="fas fa-exclamation-circle"></i> <span id="errorText">Invalid input</span>
+                    </p>
+                </div>
+
+                <!-- Swap Button Center -->
+                <div class="md:col-span-2 flex justify-center py-2 md:py-0">
+                    <button id="swapBtn" class="p-3.5 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-cyan-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all transform hover:rotate-180 border border-slate-200 dark:border-slate-600 shadow-sm" title="Swap Conversion Mode">
+                        <i class="fas fa-exchange-alt text-base md:rotate-0 rotate-90"></i>
+                    </button>
+                </div>
+
+                <!-- Output Box -->
+                <div class="md:col-span-5 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label id="outputLabel" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            Decimal Result
+                        </label>
+                    </div>
+                    <div class="relative flex items-center">
+                        <div id="outputDisplay" class="w-full px-4 py-3.5 bg-slate-100/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-lg text-slate-800 dark:text-slate-100 min-h-[58px] flex items-center overflow-x-auto select-all">
+                            0
+                        </div>
+                        <button id="copyBtn" class="absolute right-3 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-cyan-500 rounded-lg text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all shadow-sm text-xs flex items-center gap-1.5" title="Copy Result">
+                            <i class="fas fa-copy"></i>
+                            <span id="copyText" class="hidden sm:inline">Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Bit Grid / Visualization Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-100 dark:border-slate-700/60">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fas fa-microchip text-cyan-500"></i>
+                        Interactive Bit Visualizer (8-Bit Byte)
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Click on individual bits to toggle between 0 and 1
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="shiftLeftBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1" title="Shift bits left (Multiply by 2)">
+                        <i class="fas fa-arrow-left"></i> Shift Left (&lt;&lt;)
+                    </button>
+                    <button id="shiftRightBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-1" title="Shift bits right (Divide by 2)">
+                        Shift Right (&gt;&gt;) <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bit Grid Container -->
+            <div id="bitGrid" class="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3">
+                <!-- Dynamically generated 8 bits -->
+            </div>
+        </div>
+
+        <!-- Calculation & Step-by-Step Explanation Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-100 dark:border-slate-700/60">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-calculator text-cyan-500"></i>
+                Step-by-Step Conversion Breakdown
+            </h2>
+
+            <div id="explanationContainer" class="space-y-4">
+                <!-- Steps dynamically populated -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 z-50 text-sm font-medium">
+        <i class="fas fa-check-circle text-emerald-400 dark:text-emerald-600 text-lg"></i>
+        <span id="toastMessage">Copied to clipboard!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State Management
+        let currentMode = 'binToDec'; // 'binToDec' or 'decToBin'
+        let bitState = [0, 0, 0, 0, 0, 0, 0, 0]; // 8-bit array [MSB ... LSB]
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const modeBinToDec = document.getElementById('modeBinToDec');
+        const modeDecToBin = document.getElementById('modeDecToBin');
+        const swapBtn = document.getElementById('swapBtn');
+        const numberInput = document.getElementById('numberInput');
+        const outputDisplay = document.getElementById('outputDisplay');
+        const inputLabel = document.getElementById('inputLabel');
+        const outputLabel = document.getElementById('outputLabel');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const clearInputBtn = document.getElementById('clearInputBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const bitGrid = document.getElementById('bitGrid');
+        const explanationContainer = document.getElementById('explanationContainer');
+        const inputBitsCount = document.getElementById('inputBitsCount');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const shiftLeftBtn = document.getElementById('shiftLeftBtn');
+        const shiftRightBtn = document.getElementById('shiftRightBtn');
+        const sampleBtns = document.querySelectorAll('.sample-btn');
+
+        // Initial setup on load
+        window.onload = function() {
+            initTheme();
+            renderBitGrid();
+            processConversion();
+            setupEventListeners();
+        };
+
+        // Theme Toggle Functionality
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.className = 'fas fa-sun text-lg text-amber-400';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIcon.className = 'fas fa-moon text-lg text-slate-600';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                themeIcon.className = 'fas fa-moon text-lg text-slate-600';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                themeIcon.className = 'fas fa-sun text-lg text-amber-400';
+            }
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            numberInput.addEventListener('input', () => {
+                toggleClearButton();
+                processConversion();
+            });
+
+            clearInputBtn.addEventListener('click', () => {
+                numberInput.value = '';
+                toggleClearButton();
+                processConversion();
+                numberInput.focus();
+            });
+
+            modeBinToDec.addEventListener('click', () => setMode('binToDec'));
+            modeDecToBin.addEventListener('click', () => setMode('decToBin'));
+            swapBtn.addEventListener('click', toggleMode);
+
+            copyBtn.addEventListener('click', copyToClipboard);
+
+            shiftLeftBtn.addEventListener('click', () => {
+                bitState.shift();
+                bitState.push(0);
+                syncInputFromBitState();
+            });
+
+            shiftRightBtn.addEventListener('click', () => {
+                bitState.pop();
+                bitState.unshift(0);
+                syncInputFromBitState();
+            });
+
+            sampleBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const val = e.target.getAttribute('data-val');
+                    if (/^[01]+$/.test(val) && currentMode !== 'binToDec') {
+                        setMode('binToDec');
+                    } else if (/^\d+$/.test(val) && !/^[01]+$/.test(val) && currentMode !== 'decToBin') {
+                        setMode('decToBin');
+                    }
+                    numberInput.value = val;
+                    toggleClearButton();
+                    processConversion();
+                });
+            });
+        }
+
+        function toggleClearButton() {
+            if (numberInput.value.length > 0) {
+                clearInputBtn.classList.remove('hidden');
+            } else {
+                clearInputBtn.classList.add('hidden');
+            }
+        }
+
+        // Mode Switching
+        function setMode(mode) {
+            currentMode = mode;
+            if (mode === 'binToDec') {
+                modeBinToDec.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm";
+                modeDecToBin.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                inputLabel.textContent = "Enter Binary Number";
+                outputLabel.textContent = "Decimal Result";
+                numberInput.placeholder = "e.g. 10101";
+            } else {
+                modeDecToBin.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm";
+                modeBinToDec.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                inputLabel.textContent = "Enter Decimal Number";
+                outputLabel.textContent = "Binary Result";
+                numberInput.placeholder = "e.g. 42";
+            }
+            numberInput.value = "";
+            toggleClearButton();
+            hideError();
+            processConversion();
+        }
+
+        function toggleMode() {
+            setMode(currentMode === 'binToDec' ? 'decToBin' : 'binToDec');
+        }
+
+        // Main Processing Logic
+        function processConversion() {
+            const val = numberInput.value.trim();
+
+            if (val === "") {
+                outputDisplay.textContent = "0";
+                hideError();
+                inputBitsCount.textContent = "0 bits";
+                bitState = [0, 0, 0, 0, 0, 0, 0, 0];
+                updateBitGridDisplay();
+                renderExplanation(null);
+                return;
+            }
+
+            if (currentMode === 'binToDec') {
+                // Validation for Binary
+                if (!/^[01]+$/.test(val)) {
+                    showError("Invalid binary format! Only 0 and 1 are allowed.");
+                    outputDisplay.textContent = "-";
+                    renderExplanation(null);
+                    return;
+                }
+                hideError();
+                inputBitsCount.textContent = `${val.length} bit${val.length > 1 ? 's' : ''}`;
+
+                // Calculate Binary to Decimal
+                let decimalVal = BigInt(0);
+                for (let i = 0; i < val.length; i++) {
+                    const bit = BigInt(val[val.length - 1 - i]);
+                    if (bit === 1n) {
+                        decimalVal += (1n << BigInt(i));
+                    }
+                }
+
+                outputDisplay.textContent = decimalVal.toString();
+
+                // Update 8-bit visualizer array based on least significant bits
+                updateBitStateFromBinaryString(val);
+                renderExplanation({ mode: 'binToDec', input: val, result: decimalVal.toString() });
+
+            } else {
+                // Validation for Decimal
+                if (!/^\d+$/.test(val)) {
+                    showError("Invalid decimal number! Only positive integers allowed.");
+                    outputDisplay.textContent = "-";
+                    renderExplanation(null);
+                    return;
+                }
+                hideError();
+
+                try {
+                    const decBig = BigInt(val);
+                    const binStr = decBig.toString(2);
+                    outputDisplay.textContent = binStr;
+                    inputBitsCount.textContent = `${binStr.length} bit${binStr.length > 1 ? 's' : ''}`;
+
+                    updateBitStateFromBinaryString(binStr);
+                    renderExplanation({ mode: 'decToBin', input: val, result: binStr });
+                } catch (e) {
+                    showError("Number too large to process.");
+                }
+            }
+        }
+
+        // Synchronize bit array state with input
+        function updateBitStateFromBinaryString(binStr) {
+            const paddedStr = binStr.padStart(8, '0');
+            const sliced = paddedStr.slice(-8); // Take rightmost 8 bits
+            bitState = sliced.split('').map(b => parseInt(b, 10));
+            updateBitGridDisplay();
+        }
+
+        function syncInputFromBitState() {
+            const binStr = bitState.join('');
+            if (currentMode === 'binToDec') {
+                numberInput.value = binStr;
+            } else {
+                numberInput.value = parseInt(binStr, 2).toString();
+            }
+            toggleClearButton();
+            processConversion();
+        }
+
+        // Render Interactive Bit Grid
+        function renderBitGrid() {
+            bitGrid.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const power = 7 - i;
+                const value = Math.pow(2, power);
+
+                const btn = document.createElement('div');
+                btn.className = `bit-card p-3 rounded-xl border text-center cursor-pointer select-none transition-all duration-200 ${
+                    bitState[i] === 1 
+                        ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-600 dark:text-cyan-400 shadow-md shadow-cyan-500/10' 
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700/80 text-slate-400'
+                }`;
+                btn.setAttribute('data-index', i);
+
+                btn.innerHTML = `
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500 mb-1">2<sup>${power}</sup> (${value})</div>
+                    <div class="font-mono text-2xl font-bold my-1 ${bitState[i] === 1 ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-600'}">${bitState[i]}</div>
+                    <div class="text-[10px] text-slate-400 font-mono">Bit ${7-i}</div>
+                `;
+
+                btn.addEventListener('click', () => {
+                    bitState[i] = bitState[i] === 1 ? 0 : 1;
+                    syncInputFromBitState();
+                });
+
+                bitGrid.appendChild(btn);
+            }
+        }
+
+        function updateBitGridDisplay() {
+            const cards = bitGrid.children;
+            for (let i = 0; i < 8; i++) {
+                if (!cards[i]) continue;
+                const isActive = bitState[i] === 1;
+                cards[i].className = `bit-card p-3 rounded-xl border text-center cursor-pointer select-none transition-all duration-200 ${
+                    isActive 
+                        ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-600 dark:text-cyan-400 shadow-md shadow-cyan-500/10' 
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700/80 text-slate-400'
+                }`;
+                cards[i].querySelector('.font-mono.text-2xl').className = `font-mono text-2xl font-bold my-1 ${
+                    isActive ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-600'
+                }`;
+                cards[i].querySelector('.font-mono.text-2xl').textContent = bitState[i];
+            }
+        }
+
+        // Render Step-by-Step Breakdown
+        function renderExplanation(data) {
+            if (!data) {
+                explanationContainer.innerHTML = `
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-400 text-sm text-center">
+                        Enter a valid number above to see calculation steps.
+                    </div>
+                `;
+                return;
+            }
+
+            if (data.mode === 'binToDec') {
+                const bin = data.input;
+                let stepsHTML = '';
+                let terms = [];
+                let sumMath = [];
+
+                for (let i = 0; i < bin.length; i++) {
+                    const pos = bin.length - 1 - i;
+                    const bit = bin[i];
+                    const val = BigInt(bit) * (1n << BigInt(pos));
+                    
+                    if (bit === '1') {
+                        terms.push(`<span class="font-semibold text-cyan-600 dark:text-cyan-400">(1 × 2<sup>${pos}</sup>)</span>`);
+                        sumMath.push(val.toString());
+                    } else {
+                        terms.push(`<span class="opacity-50">(0 × 2<sup>${pos}</sup>)</span>`);
+                    }
+                }
+
+                stepsHTML = `
+                    <div class="space-y-3 font-mono text-sm">
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <span class="text-xs text-slate-400 font-sans block mb-1">1. Positional Expansion:</span>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                ${terms.join(' + ')}
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <span class="text-xs text-slate-400 font-sans block mb-1">2. Non-zero Powers Evaluation:</span>
+                            <div>${sumMath.length > 0 ? sumMath.join(' + ') : '0'}</div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-800 dark:text-cyan-300">
+                            <span class="text-xs text-cyan-600 dark:text-cyan-400 font-sans block mb-1">Final Result:</span>
+                            <div class="text-base font-bold">${sumMath.length > 0 ? sumMath.join(' + ') : '0'} = ${data.result}</div>
+                        </div>
+                    </div>
+                `;
+                explanationContainer.innerHTML = stepsHTML;
+
+            } else {
+                // Decimal to Binary step breakdown (Repeated Division by 2)
+                let num = BigInt(data.input);
+                if (num === 0n) {
+                    explanationContainer.innerHTML = `
+                        <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-800 dark:text-cyan-300 font-mono text-sm">
+                            Decimal 0 equals Binary 0.
+                        </div>
+                    `;
+                    return;
+                }
+
+                let rows = [];
+                let tempNum = num;
+
+                while (tempNum > 0n) {
+                    let quotient = tempNum / 2n;
+                    let remainder = tempNum % 2n;
+                    rows.push({
+                        num: tempNum.toString(),
+                        quotient: quotient.toString(),
+                        remainder: remainder.toString()
+                    });
+                    tempNum = quotient;
+                }
+
+                let rowsHTML = rows.map((r, idx) => `
+                    <tr class="border-b border-slate-100 dark:border-slate-800/60">
+                        <td class="py-2 px-3">${r.num} ÷ 2</td>
+                        <td class="py-2 px-3">${r.quotient}</td>
+                        <td class="py-2 px-3 font-bold ${r.remainder === '1' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400'}">${r.remainder}</td>
+                    </tr>
+                `).join('');
+
+                explanationContainer.innerHTML = `
+                    <div class="space-y-3 font-mono text-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 font-sans">
+                                        <th class="py-2 px-3">Division</th>
+                                        <th class="py-2 px-3">Quotient</th>
+                                        <th class="py-2 px-3">Remainder (Bit)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rowsHTML}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-800 dark:text-cyan-300">
+                            <span class="text-xs text-cyan-600 dark:text-cyan-400 font-sans block mb-1">Result (Read Remainders Bottom-to-Top):</span>
+                            <div class="text-base font-bold">${data.result}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper UI Feedback Functions
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorMessage.classList.remove('hidden');
+            numberInput.classList.add('border-rose-500', 'focus:ring-rose-500');
+            numberInput.classList.remove('focus:ring-cyan-500');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            numberInput.classList.remove('border-rose-500', 'focus:ring-rose-500');
+            numberInput.classList.add('focus:ring-cyan-500');
+        }
+
+        function copyToClipboard() {
+            const textToCopy = outputDisplay.textContent.trim();
+            if (!textToCopy || textToCopy === '-') return;
+
+            // Fallback copy execution as requested
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            showToast("Copied result to clipboard!");
+        }
+
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

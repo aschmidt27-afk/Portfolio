@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schmidty | Home & About Me</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            accent: '#06b6d4',
+                            pink: '#ec4899',
+                            emerald: '#10b981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="shared_stylesheet.css">
+    <script src="shared_application_logic.js" defer></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-40 w-full glass border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <div class="flex items-center gap-3">
+                    <a href="index_page.html" class="group flex items-center gap-2.5 text-xl font-heading font-extrabold tracking-tight">
+                        <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-accent to-brand-pink flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-300 font-bold">
+                            S
+                        </span>
+                        <div class="text-left">
+                            <span class="block text-lg font-bold leading-none bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                                Schmidty
+                            </span>
+                            <span class="text-[10px] text-brand-500 font-semibold uppercase tracking-wider">Digital Portfolio</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-1 bg-slate-200/50 dark:bg-slate-900/80 p-1.5 rounded-full border border-slate-300/50 dark:border-slate-800">
+                    <a href="index_page.html" class="nav-btn active px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-800 shadow-sm">
+                        <i class="fa-solid fa-house mr-1.5"></i>Home
+                    </a>
+                    <a href="hobbies_page.html" class="nav-btn px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-gamepad mr-1.5"></i>Hobbies
+                    </a>
+                    <a href="projects_showcase_page.html" class="nav-btn px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-code-fork mr-1.5"></i>Projects
+                    </a>
+                    <a href="binary_decimal_converter_page.html" class="nav-btn px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-calculator mr-1.5"></i>Binary
+                    </a>
+                    <a href="interactive_crossword_puzzle_page.html" class="nav-btn px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-puzzle-piece mr-1.5"></i>Crossword
+                    </a>
+                </nav>
+
+                <!-- Actions: Theme Switcher -->
+                <div class="flex items-center gap-3">
+                    <button id="theme-toggle" class="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200 flex items-center gap-2 shadow-sm">
+                        <i id="theme-icon" class="fa-solid fa-moon text-brand-500"></i>
+                        <span id="theme-text">Switch Theme</span>
+                    </button>
+
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i id="menu-icon" class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-4 pt-2 pb-4 space-y-2">
+            <a href="index_page.html" class="block px-4 py-2.5 rounded-xl text-sm font-medium bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400"><i class="fa-solid fa-house mr-3"></i>Home</a>
+            <a href="hobbies_page.html" class="block px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-gamepad mr-3"></i>Hobbies</a>
+            <a href="projects_showcase_page.html" class="block px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-code-fork mr-3"></i>Projects</a>
+            <a href="binary_decimal_converter_page.html" class="block px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-calculator mr-3"></i>Binary Converter</a>
+            <a href="interactive_crossword_puzzle_page.html" class="block px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-puzzle-piece mr-3"></i>Crossword</a>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        
+        <!-- Hero / Welcome Banner -->
+        <div class="glass p-8 sm:p-12 rounded-3xl border border-slate-200/80 dark:border-slate-800 relative overflow-hidden shadow-xl">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-4 max-w-3xl">
+                <span class="px-3 py-1 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-semibold tracking-wider uppercase border border-brand-500/20">
+                    Developer Portfolio
+                </span>
+                <h2 id="welcome-label" class="text-3xl sm:text-5xl font-extrabold font-heading tracking-tight">
+                    Welcome to <span class="gradient-text">My Digital Portfolio</span>
+                </h2>
+                <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 font-light leading-relaxed">
+                    Explore my technical projects, custom web utilities, interactive tools, and tech skills. Built with modern web standards, clean code, and responsive design.
+                </p>
+            </div>
+        </div>
+
+        <!-- Technical Skills & Counter Widget Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Technical Skills -->
+            <div class="lg:col-span-6 glass p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 space-y-6">
+                <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-heading">Technical Skills</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Java -->
+                    <div>
+                        <div class="flex justify-between items-center text-sm font-semibold mb-1.5">
+                            <span class="flex items-center gap-2"><i class="fa-brands fa-java text-red-500 text-base"></i> Java</span>
+                            <span class="text-xs text-brand-500 font-mono">Advanced</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-red-500 to-amber-500 h-full w-[88%] rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <!-- Python -->
+                    <div>
+                        <div class="flex justify-between items-center text-sm font-semibold mb-1.5">
+                            <span class="flex items-center gap-2"><i class="fa-brands fa-python text-blue-400 text-base"></i> Python</span>
+                            <span class="text-xs text-brand-500 font-mono">Proficient</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full w-[82%] rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <!-- HTML5 -->
+                    <div>
+                        <div class="flex justify-between items-center text-sm font-semibold mb-1.5">
+                            <span class="flex items-center gap-2"><i class="fa-brands fa-html5 text-orange-500 text-base"></i> HTML5 & CSS3</span>
+                            <span class="text-xs text-brand-500 font-mono">Expert</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-orange-500 to-pink-500 h-full w-[95%] rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded-md text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Object-Oriented Programming</span>
+                    <span class="px-2.5 py-1 rounded-md text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Data Structures</span>
+                    <span class="px-2.5 py-1 rounded-md text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Web Development</span>
+                </div>
+            </div>
+
+            <!-- Interactive Counter Box -->
+            <div class="lg:col-span-6 glass p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold font-heading">Interactive Counter Widget</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Click button at your own risk!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100/70 dark:bg-slate-900/60 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-center space-y-4">
+                    <div class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Current Counter Value</div>
+                    <div id="count-label" class="text-5xl font-extrabold font-mono text-brand-500 transition-all duration-200">0</div>
+                    
+                    <div class="flex items-center justify-center gap-3 pt-2">
+                        <button id="somethingbutton" class="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold text-sm shadow-lg shadow-red-500/20 active:scale-95 transition-all">
+                            DON'T CLICK
+                        </button>
+                        <button id="reset-button" title="Reset Counter" class="w-11 h-11 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-95 transition-all flex items-center justify-center text-lg">
+                            🔄
+                        </button>
+                    </div>
+                </div>
+
+                <p id="counter-easter-egg" class="text-xs text-center text-slate-500 italic min-h-[1.25rem]">
+                    Tip: See what happens as the counter gets higher!
+                </p>
+            </div>
+        </div>
+
+        <!-- Media Cards -->
+        <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 space-y-6">
+            <h3 class="text-xl font-bold font-heading flex items-center gap-2">
+                <i class="fa-solid fa-link text-brand-500"></i> Media & External Links
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- Tony Sleep Image Card -->
+                <div class="space-y-3 bg-slate-100/60 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-center">
+                    <div class="text-xs font-semibold text-slate-500">Tony Sleep Image Card</div>
+                    <div class="flex justify-center">
+                        <img src="./images/TonySleep.jpeg" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/300x200/1e293b/ffffff?text=TonySleep.jpeg';" 
+                             alt="a picture of something" 
+                             width="300" 
+                             class="rounded-xl shadow-md border border-slate-300 dark:border-slate-700 hover:scale-105 transition-transform duration-300 max-w-full h-auto">
+                    </div>
+                    <div class="pt-2">
+                        <a href="https://google.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 transition-colors">
+                            <i class="fa-brands fa-google"></i> Click Me (Google)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Go Yanks! Video Link -->
+                <div class="space-y-3 bg-slate-100/60 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-center">
+                    <div class="text-xs font-semibold text-slate-500">Go Yanks! Video Link</div>
+                    <div class="flex justify-center">
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1" target="_blank" rel="noopener" class="group relative inline-block">
+                            <img src="./images/TonySleep.jpeg" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/200x150/0f172a/38bdf8?text=Go+Yanks!+Video';" 
+                                 alt="Go Yanks!" 
+                                 width="200" 
+                                 class="rounded-xl shadow-md border border-slate-300 dark:border-slate-700 group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-slate-950/40 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fa-solid fa-play text-white text-2xl"></i>
+                            </div>
+                        </a>
+                    </div>
+                    <p class="text-xs text-slate-500">Click image to open YouTube player</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preserved Footer Info -->
+        <div class="glass p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-wrap justify-between items-center text-xs text-slate-500 gap-4">
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 font-mono">Lorem</span>
+                <span>Hello World!</span>
+            </div>
+            <div class="text-slate-400">Status: Active Development</div>
+        </div>
+
+    </main>
+
+    <footer class="mt-auto border-t border-slate-200/80 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <p>© <span id="current-year"></span> Schmidty. All rights reserved.</p>
+            <div class="flex gap-4">
+                <a href="index_page.html" class="hover:text-brand-500">Home</a>
+                <a href="hobbies_page.html" class="hover:text-brand-500">Hobbies</a>
+                <a href="projects_showcase_page.html" class="hover:text-brand-500">Projects</a>
+                <a href="binary_decimal_converter_page.html" class="hover:text-brand-500">Binary</a>
+                <a href="interactive_crossword_puzzle_page.html" class="hover:text-brand-500">Crossword</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
